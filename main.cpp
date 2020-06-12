@@ -24,6 +24,7 @@ struct Player {
 	}
 };
 
+//паттерн "Наблюдатель"
 class Observer
 {
   public:
@@ -31,18 +32,19 @@ class Observer
 	virtual Player& get() = 0;
 };
  
+//Сама игра
 class Subject
 {
 	vector<Observer*> m_views;
 	ofstream out;
-	int num; 
+	int num; // количество игроков
 public:
 
-	Subject() { num = 0; } 
+	Subject() { num = 0; } // изначально количество 0
 	void attach(Observer *obs)
 	{
 		m_views.push_back(obs);
-		num++; 
+		num++; // увеличиваем на 1 каждый раз, как добавляется игрок
 	}
 	void play(int val)
 	{
@@ -57,34 +59,36 @@ public:
 		out.open(huc+to_string(rand()) + to_string(rand()) + ".txt");
 		notify();
 		for (int i = 0; i < val; ++i) {
-			vector<int> chances; 
+			//Играем
+			vector<int> chances; // массив с шансами на победу каждого игрока
 			int speed, luck;
-			for (int j = 0; j < num; ++j) 
+			for (int j = 0; j < num; ++j) // проходим по всем игрокам
 			{
-				speed = rand() % 11; 
-				luck = rand() % 11; 
-				chances.push_back(speed*luck);
+				speed = rand() % 11; // скорость от 0 до 10
+				luck = rand() % 11; // удача от 0 до 10
+				chances.push_back(speed*luck); // шансы на победу = скорость*удача
 				out << "################################################################################################\n";
 				out << "Харроктиристики игроков игрок №" << j << "\n";
 				out << "Скорость " << speed << "\n";
 				out << "Удача " << luck << "\n";
+
 			}
-			int maxch = 0; 
-			int winner = 0; 
+			int maxch = 0; // максимальный шанс на победу
+			int winner = 0; // номер победившего игрока
 			for (int j = 0; j < num; ++j)
 			{
-				if (maxch < chances.at(j)) 
+				if (maxch < chances.at(j)) // если максимальный шанс меньше текущего
 				{
-					maxch = chances.at(j); 
-						winner = j; 
+					maxch = chances.at(j); // то текущий шанс делаем максимальным
+						winner = j; // и это победитель
 				}
 			}
 			for (int j = 0; j < num; ++j)
 			{
-				if (winner == j) 
-					(m_views.at(j))->get().wins += 1; 
+				if (winner == j) // если текущий игрок победил
+					(m_views.at(j))->get().wins += 1; // увеличиваем его счетчик побед
 				else
-					(m_views.at(j))->get().wins += 0; 
+					(m_views.at(j))->get().wins += 0; // иначе не увеличиваем
 			}
 			cout << "_________________________________________________________________________________________________" << endl;
 			out << "_________________________________________________________________________________________________" << "\n";
@@ -97,6 +101,7 @@ public:
 			
 		}
 	}
+	//Оповещаем всех наблюдателей
 	void notify()
 	{
 		if (flag == 0)
@@ -109,6 +114,7 @@ public:
 	}
 };
 
+//Наблюдаем за всеми игроками
 class AllObserver : public Observer
 {
 	Player player;
@@ -167,12 +173,13 @@ int main()
   Subject subj;
   int game=0;
   int cnt;
-  int buff; 
-  ifstream fin("all.txt"); 
+  int buff; // буфер промежуточного хранения считываемого из файла текста
+  ifstream fin("all.txt"); // открыли файл для чтения
   ifstream in("all.txt");
   fin >> buff;
   in >> cnt;
   vector<Player> players(cnt);
+  //Считываем игроков из файла
   for (auto& p : players) {
 	  in >> p;
   }
@@ -236,5 +243,8 @@ int main()
 	  cout << "Вы выиграли!" << endl;
   else
 	  cout << "Вы проиграли!" << endl;
+
+  cout << "\nПрограмма завершила работу!" << endl;
   system("pause>>void");
+  return(0);
 }
