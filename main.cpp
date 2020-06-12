@@ -5,8 +5,12 @@
 #include <cstdlib>
 #include <algorithm>
 #include <time.h>
+
 using namespace std;
-int wins, flag;
+int wins, flag,i1,i2;
+char huc[20]="Match";
+
+//Игрок
 struct Player {
 	string name;
 	string country;
@@ -19,18 +23,21 @@ struct Player {
 		return in;
 	}
 };
+
 class Observer
 {
   public:
     virtual void update(int value, ofstream&) = 0;
 	virtual Player& get() = 0;
 };
+ 
 class Subject
 {
 	vector<Observer*> m_views;
 	ofstream out;
 	int num; 
 public:
+
 	Subject() { num = 0; } 
 	void attach(Observer *obs)
 	{
@@ -39,23 +46,34 @@ public:
 	}
 	void play(int val)
 	{
-		out.open(to_string(rand()) + to_string(rand()) + ".txt");
+		int cs;
+		cout << "Хотите ли вы изменить имя фалйла для сохранеия результаьов (да-1/нет-0)" << endl;
+		cin >> cs;
+		if (cs == 1) {
+			cout << "Введите имя файла :";
+			cin >> huc;
+			cout << endl;
+		}
+		out.open(huc+to_string(rand()) + to_string(rand()) + ".txt");
 		notify();
 		for (int i = 0; i < val; ++i) {
-			//Играем
 			vector<int> chances; 
 			int speed, luck;
 			for (int j = 0; j < num; ++j) 
 			{
 				speed = rand() % 11; 
 				luck = rand() % 11; 
-				chances.push_back(speed*luck); 
+				chances.push_back(speed*luck);
+				out << "################################################################################################\n";
+				out << "Харроктиристики игроков игрок №" << j << "\n";
+				out << "Скорость " << speed << "\n";
+				out << "Удача " << luck << "\n";
 			}
 			int maxch = 0; 
 			int winner = 0; 
 			for (int j = 0; j < num; ++j)
 			{
-				if (maxch < chances.at(j))
+				if (maxch < chances.at(j)) 
 				{
 					maxch = chances.at(j); 
 						winner = j; 
@@ -68,6 +86,8 @@ public:
 				else
 					(m_views.at(j))->get().wins += 0; 
 			}
+			cout << "_________________________________________________________________________________________________" << endl;
+			out << "_________________________________________________________________________________________________" << "\n";
 			out << "Матч: " << i + 1 << "\n";
 			cout << endl << "Матч: " << i + 1 << endl;
 			cout << "В этом матче побеждает ";
@@ -77,7 +97,6 @@ public:
 			
 		}
 	}
-	//Оповещаем всех наблюдателей
 	void notify()
 	{
 		if (flag == 0)
@@ -106,7 +125,7 @@ public:
 	}
 };
  
-
+//За кем будем наблюдать
 class MainObserver: public Observer
 {
 	Player player; 
@@ -143,6 +162,7 @@ class MainObserver: public Observer
 int main()
 {
   setlocale(LC_ALL, "Russian");
+  system("color F0");
   srand(time(NULL));
   Subject subj;
   int game=0;
@@ -156,7 +176,7 @@ int main()
   for (auto& p : players) {
 	  in >> p;
   }
-  cout << "Добавить игроков в базу? (1/0): ";
+  cout << "Добавить игроков в базу? (да-1/нет-0): ";
   char ch;
   cin >> ch;
   switch (ch)
@@ -187,7 +207,7 @@ int main()
   cout << "Игроки:" << endl;
   for (int i = 0; i < players.size(); ++i)
   {
-	  cout << players.at(i).name << endl;
+	  cout << i<<") "<<players.at(i).name << endl;
   }
   cout << "Введите номер игрока для наблюдения (от 0 до " << players.size() - 1 << ") : ";
   cin >> cnt;
@@ -207,13 +227,14 @@ int main()
   }
   wins = 0;
   flag = 0;
-  cout << "\nВведите количество проводимых матчей: "; 
+  cout << "\nВведите количество проводимых матчей (обычно их 5): "; 
   cin >> game;
   subj.play(game);
-  if (wins > 2)
+  cout << "Соотношение побед/поражениям "<< wins <<"/"<< game-wins << endl;
+  cout << "Итог: _________________________________________________________________________________________________" << endl;
+  if (wins > (game/2))
 	  cout << "Вы выиграли!" << endl;
   else
 	  cout << "Вы проиграли!" << endl;
-
   system("pause>>void");
 }
