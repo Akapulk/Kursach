@@ -5,11 +5,11 @@
 #include <cstdlib>
 #include <algorithm>
 #include <time.h>
+#include <windows.h>
 
 using namespace std;
 int wins, flag,i1,i2;
 char huc[20]="Match";
-
 //Игрок
 struct Player {
 	string name;
@@ -23,7 +23,6 @@ struct Player {
 		return in;
 	}
 };
-
 //паттерн "Наблюдатель"
 class Observer
 {
@@ -31,7 +30,6 @@ class Observer
     virtual void update(int value, ofstream&) = 0;
 	virtual Player& get() = 0;
 };
- 
 //Сама игра
 class Subject
 {
@@ -130,7 +128,6 @@ public:
 		out << player.name  << "\t\t" << player.wins << "\t";
 	}
 };
- 
 //За кем будем наблюдать
 class MainObserver: public Observer
 {
@@ -171,6 +168,11 @@ int main()
   system("color F0");
   srand(time(NULL));
   Subject subj;
+  cout << "\t\t\t\t\t BIG TENNIS \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"<<endl;// Заставка
+  cout << "\t\t\t\t\t\t\t\t\t\tDevolopmet by Sedov Vadim GR.1742" << endl;
+  Sleep(1000);
+  system("cls");
+  system("color F0");
   int game=0;
   int cnt;
   int buff; // буфер промежуточного хранения считываемого из файла текста
@@ -243,8 +245,6 @@ int main()
 	  cout << "Вы выиграли!" << endl;
   else
 	  cout << "Вы проиграли!" << endl;
-
-  cout << "\nПрограмма завершила работу!" << endl;
   system("pause>>void");
   return(0);
 }
