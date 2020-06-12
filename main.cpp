@@ -4,12 +4,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <algorithm>
-
-
+#include <time.h>
 using namespace std;
 int wins, flag;
-
-
 struct Player {
 	string name;
 	string country;
@@ -22,21 +19,17 @@ struct Player {
 		return in;
 	}
 };
-
-
 class Observer
 {
   public:
     virtual void update(int value, ofstream&) = 0;
 	virtual Player& get() = 0;
 };
- 
-
 class Subject
 {
 	vector<Observer*> m_views;
 	ofstream out;
-	int num;
+	int num; 
 public:
 	Subject() { num = 0; } 
 	void attach(Observer *obs)
@@ -49,22 +42,22 @@ public:
 		out.open(to_string(rand()) + to_string(rand()) + ".txt");
 		notify();
 		for (int i = 0; i < val; ++i) {
-		
+			//Играем
 			vector<int> chances; 
 			int speed, luck;
-			for (int j = 0; j < num; ++j)
+			for (int j = 0; j < num; ++j) 
 			{
 				speed = rand() % 11; 
-				luck = rand() % 11;
+				luck = rand() % 11; 
 				chances.push_back(speed*luck); 
 			}
 			int maxch = 0; 
-			int winner = 0;
+			int winner = 0; 
 			for (int j = 0; j < num; ++j)
 			{
-				if (maxch < chances.at(j)) 
+				if (maxch < chances.at(j))
 				{
-					maxch = chances.at(j);
+					maxch = chances.at(j); 
 						winner = j; 
 				}
 			}
@@ -75,20 +68,20 @@ public:
 				else
 					(m_views.at(j))->get().wins += 0; 
 			}
-			out << "Match: " << i + 1 << "\n";
-			cout << endl << "Match: " << i + 1 << endl;
-			cout << "Pobeshdaet ";
+			out << "Матч: " << i + 1 << "\n";
+			cout << endl << "Матч: " << i + 1 << endl;
+			cout << "В этом матче побеждает ";
 			cout << (m_views.at(winner))->get().name << endl;
-			cout << "Igrok\tPobed" << endl;
+			cout << "Имя игрока\tВсего побед" << endl;
 			notify();
 			
 		}
 	}
-	
+	//Оповещаем всех наблюдателей
 	void notify()
 	{
 		if (flag == 0)
-			cout << "Sootnoshenie pobed do matcha:" << endl;
+			cout << "Соотношение побед до начала матча:" << endl;
 			sort(m_views.begin(), m_views.end(), [](Observer* a, Observer* b) {return a->get().wins > b->get().wins; });
 			for (int i = 0; i < m_views.size(); ++i) {
 				m_views[i]->update(i, out);
@@ -112,6 +105,7 @@ public:
 		out << player.name  << "\t\t" << player.wins << "\t";
 	}
 };
+ 
 
 class MainObserver: public Observer
 {
@@ -139,8 +133,8 @@ class MainObserver: public Observer
 		 }
 		 else
 		 {
-			 out << player.name << "\t\t" << player.wins << "\t" << (is_win ? " Win" : " Los");
-			 cout << player.name << "\t\t" << player.wins << "\t" << (is_win ? " Win" : " Los");
+			 out << player.name << "\t\t" << player.wins << "\t" << (is_win ? " Победа" : " Проигрыш");
+			 cout << player.name << "\t\t" << player.wins << "\t" << (is_win ? " Победа" : " Проигрыш");
 		 }
 
     }
@@ -148,6 +142,8 @@ class MainObserver: public Observer
  
 int main()
 {
+  setlocale(LC_ALL, "Russian");
+  srand(time(NULL));
   Subject subj;
   int game=0;
   int cnt;
@@ -160,21 +156,21 @@ int main()
   for (auto& p : players) {
 	  in >> p;
   }
-  cout << "Dobavit igrakov v bazu? (1/0): ";
+  cout << "Добавить игроков в базу? (1/0): ";
   char ch;
   cin >> ch;
   switch (ch)
   {
   case '1':
 
-	  cout << "\nVvedite kol novih igracov: "; cin >> cnt;
+	  cout << "\nВведите количество новых игроков: "; cin >> cnt;
 	  for (int i = 0; i < cnt; ++i) {
 		  string name, country;
 		  int year, wins;
-		  cout << "Ima: "; cin >> name;
-		  cout << "Stran: "; cin >> country;
-		  cout << "Pobedi: "; cin >> wins;
-		  cout << "God: "; cin >> year;
+		  cout << "Имя: "; cin >> name;
+		  cout << "Страна: "; cin >> country;
+		  cout << "Победы: "; cin >> wins;
+		  cout << "Год: "; cin >> year;
 		  players.push_back(Player{country, name, year, wins});
 	  }
 	  break;
@@ -182,15 +178,24 @@ int main()
   case '0':
 
 	  break;
+    default:
+		cout << "Ой. Что-то пошло не так. произошла ошибочка :)" << endl;
+		system("PAUSE");
+		return 0;
+		break;
 }
-  cout << "igroki:" << endl;
+  cout << "Игроки:" << endl;
   for (int i = 0; i < players.size(); ++i)
   {
 	  cout << players.at(i).name << endl;
   }
-  cout << "Vvidite № igroka (ot 0 do " << players.size() - 1 << ") : ";
+  cout << "Введите номер игрока для наблюдения (от 0 до " << players.size() - 1 << ") : ";
   cin >> cnt;
- 
+  if (cnt > players.size() - 1) {
+	  cout << "Мы не нашли игрока под таким номером в списке создайте его и попробуйте снова 0_o" << endl;
+	  system("PAUSE");
+	  return 0;
+  }
   vector<Observer*> obs;
   for (int i = 0; i < players.size(); ++i) {
 	  if (i != cnt) {
@@ -202,13 +207,13 @@ int main()
   }
   wins = 0;
   flag = 0;
-  cout << "\nKol match: "; 
+  cout << "\nВведите количество проводимых матчей: "; 
   cin >> game;
   subj.play(game);
-  if (wins > 1)
-	  cout << "You win!" << endl;
+  if (wins > 2)
+	  cout << "Вы выиграли!" << endl;
   else
-	  cout << "You los!" << endl;
+	  cout << "Вы проиграли!" << endl;
 
   system("pause>>void");
 }
